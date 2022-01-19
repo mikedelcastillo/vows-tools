@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/mikedelcastillo/vows-tools/issues"
   },
-  "homepage": "https://github.com/mikedelcastillo/vows-tools#readme"
+  "homepage": "https://github.com/mikedelcastillo/vows-tools#readme",
+  "dependencies": {
+    "typescript": "^4.5.4"
+  }
 }
