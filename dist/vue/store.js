@@ -35,7 +35,6 @@ function vuexModule(baseURL) {
     const request = axios_1.default.create({
         baseURL,
     });
-    console.log(baseURL);
     let guest_code = storage.get(GUEST_CODE_KEY);
     guest_code = (guest_code || "").trim().length == 0 ? null : guest_code;
     const vuexModule = {
