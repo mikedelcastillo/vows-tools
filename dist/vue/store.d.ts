@@ -1,16 +1,24 @@
 export declare function vuexModule(baseURL: string): {
+    namespaced: boolean;
     state: {
-        guestCode: string;
+        guest_code: any;
         guest: any;
     };
     mutations: {
         setGuest(state: any, guest: any): void;
-        setGuestCode(state: any, guestCode: any): void;
+        setGuestCode(state: any, guest_code: any): void;
+        clear(state: any): void;
     };
     actions: {
         getGuest({ commit }: {
             commit: any;
-        }): Promise<void>;
+        }, guest_code: any): Promise<any>;
+        login({ dispatch, commit }: {
+            dispatch: any;
+            commit: any;
+        }, guest_code: any): Promise<boolean>;
     };
-    getters: {};
+    getters: {
+        loggedIn(state: any): boolean;
+    };
 };
