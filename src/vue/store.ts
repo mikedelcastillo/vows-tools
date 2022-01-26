@@ -28,7 +28,7 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
         },
         clear(){
             this.set('guest_code', null)
-            this.set('last_update', 0)
+            this.set('last_updated', 0)
             try{
                 localStorage.removeItem(storageKey)
             } catch(e){
@@ -59,7 +59,7 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
             setGuestCode(state, guest_code){
                 state.guest_code = guest_code
                 storage.set('guest_code', guest_code)
-                storage.set('last_update', (new Date()).getTime())
+                storage.set('last_updated', (new Date()).getTime())
             },
             clear(state){
                 state.guest_code = null
