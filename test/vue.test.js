@@ -5,7 +5,7 @@ const axios = require('axios')
 
 const { createStore } = require('vuex')
 const { vuexModule } = require('../dist/index')
-const { routerGuard } = require('../dist/index')
+const { createRouterGuard } = require('../dist/index')
 
 let store = null
 
@@ -20,7 +20,6 @@ const mockRoutes = {
 
 describe("Test the store", () => {
     test('Setup store with vows module', () => {
-
         store = createStore({
             modules: {
                 vows: vuexModule(process.env.API_URL),
@@ -64,11 +63,11 @@ describe("Test the store", () => {
 
 describe('Test router guard authenticated', () => {
     test('Create route guard', async () => {
-        const guard = routerGuard(store)
+        const guard = createRouterGuard(store)
     })
     
     test('Allow access to protected route', async () => {
-        const guard = routerGuard(store, () => {
+        const guard = createRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
             fail("User logged in but not allowed to access protected route")
@@ -80,7 +79,7 @@ describe('Test router guard authenticated', () => {
     })
 
     test('Allow access to unprotected route', async () => {
-        const guard = routerGuard(store, () => {
+        const guard = createRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
             fail("User logged in but not allowed to access unprotected route")
@@ -92,7 +91,7 @@ describe('Test router guard authenticated', () => {
     })
 
     test('Block access to public only route', async () => {
-        const guard = routerGuard(store, () => {
+        const guard = createRouterGuard(store, () => {
             // Pass
         }, () => {
             fail("User logged in but not allowed to access unprotected route")
@@ -109,7 +108,7 @@ describe('Test router guard authenticated', () => {
         expect(store.state.vows.guest_code).not.toBeNull()
         expect(store.getters['vows/loggedIn']).toBe(false)
         
-        const guard = routerGuard(store, () => {
+        const guard = createRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
             fail("User logged in but not allowed to access unprotected route")
@@ -123,7 +122,6 @@ describe('Test router guard authenticated', () => {
 })
 
 describe('Clear the store', () => {
-    
     test('commit: clear', async () => {
         store.commit('vows/clear')
         expect(store.state.vows.guest_code).toBeNull()
@@ -136,7 +134,7 @@ describe('Clear the store', () => {
 
 describe('Test router guard unauthenticated', () => {
     test('Block access to protected route', async () => {
-        const guard = routerGuard(store, () => {
+        const guard = createRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
             // Pass
@@ -148,7 +146,7 @@ describe('Test router guard unauthenticated', () => {
     })
 
     test('Allow access to unprotected route', async () => {
-        const guard = routerGuard(store, () => {
+        const guard = createRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
             fail("User logged out but not allowed to access unprotected route")
@@ -160,7 +158,7 @@ describe('Test router guard unauthenticated', () => {
     })
 
     test('Allow access to public only route', async () => {
-        const guard = routerGuard(store, () => {
+        const guard = createRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
             fail("User logged in but not allowed to access unprotected route")

@@ -4,7 +4,7 @@ export interface RouterGuardOptions {
     keepOutKey?: string,
 }
 
-export const routerGuard = (store, keepIn: Function, keepOut: Function, options: RouterGuardOptions = {}) => {
+export const createRouterGuard = (store, keepIn: Function, keepOut: Function, options: RouterGuardOptions = {}) => {
     options = Object.assign({
         vuexModule: "vows",
         keepOutKey: "requiresAuth",
