@@ -1,38 +1,53 @@
-import { CompilerDeprecationTypes } from '@vue/compiler-core'
 import axios from 'axios'
 
-export function createVuexModule(baseURL: string){
-    const GUEST_CODE_KEY = "vows_guest_code"
-
-    const backupStorage = {}
+export function createVuexModule(baseURL: string, storageKey: string = "vows"){
     const storage = {
-        get(key: string){
+        state: {
+            guest_code: null,
+            last_updated: 0,
+        },
+        restore(){
             try{
-                return localStorage.getItem(key)
+                this.state = JSON.parse(localStorage.getItem(storageKey))
             } catch(e){
-                return backupStorage[key]
+                this.error(e)
             }
+        },
+        get(key: string){
+            return this.state[key]
         },
         set(key: string, value: any){
+            this.state[key] = value
             try{
-                return localStorage.setItem(key, value)
+                localStorage.setItem(storageKey, JSON.stringify(this.state))
             } catch(e){
-                return backupStorage[key] = value
+                this.error(e)
             }
         },
+        clear(){
+            this.set('guest_code', null)
+            this.set('last_update', 0)
+            try{
+                localStorage.removeItem(storageKey)
+            } catch(e){
+                this.error(e)
+            }
+        },
+        error(e){
+            // console.warn(e)
+        },
     }
+
+    storage.restore()
     
     const request = axios.create({
         baseURL,
     })
 
-    let guest_code = storage.get(GUEST_CODE_KEY)
-    guest_code = (guest_code || "").trim().length == 0 ? null : guest_code
-
     const vuexModule = {
         namespaced: true,
         state: {
-            guest_code,
+            guest_code: storage.state.guest_code,
             guest: null,
         },
         mutations: {
@@ -41,12 +56,13 @@ export function createVuexModule(baseURL: string){
             },
             setGuestCode(state, guest_code){
                 state.guest_code = guest_code
-                storage.set(GUEST_CODE_KEY, guest_code)
+                storage.set('guest_code', guest_code)
+                storage.set('last_update', (new Date()).getTime())
             },
             clear(state){
                 state.guest_code = null
                 state.guest = null
-                storage.set(GUEST_CODE_KEY, "")
+                storage.clear()
             },
         },
         actions: {

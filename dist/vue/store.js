@@ -11,36 +11,54 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createVuexModule = void 0;
 const axios_1 = require("axios");
-function createVuexModule(baseURL) {
-    const GUEST_CODE_KEY = "vows_guest_code";
-    const backupStorage = {};
+function createVuexModule(baseURL, storageKey = "vows") {
     const storage = {
-        get(key) {
+        state: {
+            guest_code: null,
+            last_updated: 0,
+        },
+        restore() {
             try {
-                return localStorage.getItem(key);
+                this.state = JSON.parse(localStorage.getItem(storageKey));
             }
             catch (e) {
-                return backupStorage[key];
+                this.error(e);
             }
+        },
+        get(key) {
+            return this.state[key];
         },
         set(key, value) {
+            this.state[key] = value;
             try {
-                return localStorage.setItem(key, value);
+                localStorage.setItem(storageKey, JSON.stringify(this.state));
             }
             catch (e) {
-                return backupStorage[key] = value;
+                this.error(e);
             }
         },
+        clear() {
+            this.set('guest_code', null);
+            this.set('last_update', 0);
+            try {
+                localStorage.removeItem(storageKey);
+            }
+            catch (e) {
+                this.error(e);
+            }
+        },
+        error(e) {
+            // console.warn(e)
+        },
     };
+    storage.restore();
     const request = axios_1.default.create({
         baseURL,
     });
-    let guest_code = storage.get(GUEST_CODE_KEY);
-    guest_code = (guest_code || "").trim().length == 0 ? null : guest_code;
     const vuexModule = {
         namespaced: true,
         state: {
-            guest_code,
+            guest_code: storage.state.guest_code,
             guest: null,
         },
         mutations: {
@@ -49,12 +67,13 @@ function createVuexModule(baseURL) {
             },
             setGuestCode(state, guest_code) {
                 state.guest_code = guest_code;
-                storage.set(GUEST_CODE_KEY, guest_code);
+                storage.set('guest_code', guest_code);
+                storage.set('last_update', (new Date()).getTime());
             },
             clear(state) {
                 state.guest_code = null;
                 state.guest = null;
-                storage.set(GUEST_CODE_KEY, "");
+                storage.clear();
             },
         },
         actions: {
