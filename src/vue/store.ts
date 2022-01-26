@@ -1,7 +1,7 @@
 import { CompilerDeprecationTypes } from '@vue/compiler-core'
 import axios from 'axios'
 
-export function vuexModule(baseURL: string){
+export function createVuexModule(baseURL: string){
     const GUEST_CODE_KEY = "vows_guest_code"
 
     const backupStorage = {}

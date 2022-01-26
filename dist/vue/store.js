@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.vuexModule = void 0;
+exports.createVuexModule = void 0;
 const axios_1 = require("axios");
-function vuexModule(baseURL) {
+function createVuexModule(baseURL) {
     const GUEST_CODE_KEY = "vows_guest_code";
     const backupStorage = {};
     const storage = {
@@ -88,4 +88,4 @@ function vuexModule(baseURL) {
     };
     return vuexModule;
 }
-exports.vuexModule = vuexModule;
+exports.createVuexModule = createVuexModule;

@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createRouterGuard = void 0;
-const createRouterGuard = (store, keepIn, keepOut, options = {}) => {
+exports.createVueRouterGuard = void 0;
+const createVueRouterGuard = (store, keepIn, keepOut, options = {}) => {
     options = Object.assign({
         vuexModule: "vows",
         keepOutKey: "requiresAuth",
@@ -48,4 +48,4 @@ const createRouterGuard = (store, keepIn, keepOut, options = {}) => {
     }
     return guard;
 };
-exports.createRouterGuard = createRouterGuard;
+exports.createVueRouterGuard = createVueRouterGuard;

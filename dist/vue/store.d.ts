@@ -1,4 +1,4 @@
-export declare function vuexModule(baseURL: string): {
+export declare function createVuexModule(baseURL: string): {
     namespaced: boolean;
     state: {
         guest_code: any;
