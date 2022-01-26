@@ -49,6 +49,9 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
     const vuexModule = {
         namespaced: true,
         state: {
+            loading: {
+                login: false,
+            },
             guest_code: storage.get('guest_code'),
             guest: null,
         },
@@ -60,6 +63,9 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                 state.guest_code = guest_code
                 storage.set('guest_code', guest_code)
                 storage.set('last_updated', (new Date()).getTime())
+            },
+            setLoading(state, load){
+                state.loading = Object.assign(state.loading, load)
             },
             clear(state){
                 state.guest_code = null
@@ -78,13 +84,20 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                 return data
             },
             async login({dispatch, commit}, guest_code){
-                const data = await dispatch('getGuest', guest_code)
-                if(typeof data.guest === "object"){
-                    commit('setGuestCode', guest_code)
-                    commit('setGuest', data.guest)
-                    return true
+                commit('setLoading', { login: true })
+                try{
+                    const data = await dispatch('getGuest', guest_code)
+                    if(typeof data.guest === "object"){
+                        commit('setGuestCode', guest_code)
+                        commit('setGuest', data.guest)
+                        commit('setLoading', { login: false })
+                    } else{
+                        throw new Error('Data recieved is invalid')
+                    }
+                } catch(e){
+                    commit('setLoading', { login: false })
+                    throw e
                 }
-                return false
             }
         },
         getters: {

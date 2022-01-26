@@ -60,6 +60,9 @@ function createVuexModule(baseURL, storageKey = "vows") {
     const vuexModule = {
         namespaced: true,
         state: {
+            loading: {
+                login: false,
+            },
             guest_code: storage.get('guest_code'),
             guest: null,
         },
@@ -71,6 +74,9 @@ function createVuexModule(baseURL, storageKey = "vows") {
                 state.guest_code = guest_code;
                 storage.set('guest_code', guest_code);
                 storage.set('last_updated', (new Date()).getTime());
+            },
+            setLoading(state, load) {
+                state.loading = Object.assign(state.loading, load);
             },
             clear(state) {
                 state.guest_code = null;
@@ -91,13 +97,22 @@ function createVuexModule(baseURL, storageKey = "vows") {
             },
             login({ dispatch, commit }, guest_code) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const data = yield dispatch('getGuest', guest_code);
-                    if (typeof data.guest === "object") {
-                        commit('setGuestCode', guest_code);
-                        commit('setGuest', data.guest);
-                        return true;
+                    commit('setLoading', { login: true });
+                    try {
+                        const data = yield dispatch('getGuest', guest_code);
+                        if (typeof data.guest === "object") {
+                            commit('setGuestCode', guest_code);
+                            commit('setGuest', data.guest);
+                            commit('setLoading', { login: false });
+                        }
+                        else {
+                            throw new Error('Data recieved is invalid');
+                        }
                     }
-                    return false;
+                    catch (e) {
+                        commit('setLoading', { login: false });
+                        throw e;
+                    }
                 });
             }
         },

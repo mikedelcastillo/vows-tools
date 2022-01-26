@@ -50,10 +50,8 @@ describe("Test the store", () => {
     })
 
     test('dispatch: login(TEST_GUEST_CODE', async () => {
-        const data = await store.dispatch('vows/login', process.env.TEST_GUEST_CODE)
+        await store.dispatch('vows/login', process.env.TEST_GUEST_CODE)
         await flushPromises()
-        expect(data).toBe(true)
-        
     })
 
     test('getters: loggedIn', async () => {
