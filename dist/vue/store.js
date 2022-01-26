@@ -18,12 +18,14 @@ function createVuexModule(baseURL, storageKey = "vows") {
             last_updated: 0,
         },
         restore() {
+            let json = {};
             try {
-                this.state = JSON.parse(localStorage.getItem(storageKey));
+                json = JSON.parse(localStorage.getItem(storageKey));
             }
             catch (e) {
                 this.error(e);
             }
+            this.state = Object.assign(this.state, json);
         },
         get(key) {
             return this.state[key];
@@ -58,7 +60,7 @@ function createVuexModule(baseURL, storageKey = "vows") {
     const vuexModule = {
         namespaced: true,
         state: {
-            guest_code: storage.state.guest_code,
+            guest_code: storage.get('guest_code'),
             guest: null,
         },
         mutations: {

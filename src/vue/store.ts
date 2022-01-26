@@ -7,11 +7,13 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
             last_updated: 0,
         },
         restore(){
+            let json = {}
             try{
-                this.state = JSON.parse(localStorage.getItem(storageKey))
+                json = JSON.parse(localStorage.getItem(storageKey))
             } catch(e){
                 this.error(e)
             }
+            this.state = Object.assign(this.state, json)
         },
         get(key: string){
             return this.state[key]
@@ -47,7 +49,7 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
     const vuexModule = {
         namespaced: true,
         state: {
-            guest_code: storage.state.guest_code,
+            guest_code: storage.get('guest_code'),
             guest: null,
         },
         mutations: {
