@@ -1,1 +1,6 @@
-export declare const routerGuard: (store: any, out: any, vuexModule?: string, metaKey?: string) => (to: any, from: any, next: any) => any;
+export interface RouterGuardOptions {
+    vuexModule?: string;
+    keepInKey?: string;
+    keepOutKey?: string;
+}
+export declare const routerGuard: (store: any, keepIn: Function, keepOut: Function, options?: RouterGuardOptions) => (to: any, from: any, next: any) => any;

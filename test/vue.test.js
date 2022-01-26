@@ -9,16 +9,13 @@ const { routerGuard } = require('../dist/index')
 
 let store = null
 
-const authRoute = {
-    matched: {
-        some: () => true,
-    },
-}
-
-const noAuthRoute = {
-    matched: {
-        some: () => false,
-    },
+const mockRoute = meta => ({
+    matched: [ {meta}, {meta}, {meta} ],
+})
+const mockRoutes = {
+    public: mockRoute({}),
+    requiresAuth: mockRoute({ requiresAuth: true }),
+    requiresUnauth: mockRoute({ requiresUnauth: true }),
 }
 
 describe("Test the store", () => {
@@ -72,9 +69,11 @@ describe('Test router guard authenticated', () => {
     
     test('Allow access to protected route', async () => {
         const guard = routerGuard(store, () => {
+            fail("User should not be redirected to keep in")
+        }, () => {
             fail("User logged in but not allowed to access protected route")
         })
-        await guard(authRoute, noAuthRoute, () => {
+        await guard(mockRoutes.requiresAuth, mockRoutes.public, () => {
             // Pass
         })
         await flushPromises()
@@ -82,24 +81,40 @@ describe('Test router guard authenticated', () => {
 
     test('Allow access to unprotected route', async () => {
         const guard = routerGuard(store, () => {
+            fail("User should not be redirected to keep in")
+        }, () => {
             fail("User logged in but not allowed to access unprotected route")
         })
-        await guard(noAuthRoute, noAuthRoute, () => {
+        await guard(mockRoutes.public, mockRoutes.public, () => {
             // Pass
         })
         await flushPromises()
     })
 
-    test('Simulate guest_code only cached', async () => {
+    test('Block access to public only route', async () => {
+        const guard = routerGuard(store, () => {
+            // Pass
+        }, () => {
+            fail("User logged in but not allowed to access unprotected route")
+        })
+        await guard(mockRoutes.requiresUnauth, mockRoutes.public, () => {
+            fail("User should be kept in")
+        })
+        await flushPromises()
+    })
+
+    test('Simulate auto re-login', async () => {
         store.commit('vows/setGuest', null)
         expect(store.state.vows.guest).toBeNull()
         expect(store.state.vows.guest_code).not.toBeNull()
         expect(store.getters['vows/loggedIn']).toBe(false)
         
         const guard = routerGuard(store, () => {
+            fail("User should not be redirected to keep in")
+        }, () => {
             fail("User logged in but not allowed to access unprotected route")
         })
-        await guard(authRoute, noAuthRoute, () => {
+        await guard(mockRoutes.requiresAuth, mockRoutes.public, () => {
             // Pass
         })
         await flushPromises()
@@ -122,9 +137,11 @@ describe('Clear the store', () => {
 describe('Test router guard unauthenticated', () => {
     test('Block access to protected route', async () => {
         const guard = routerGuard(store, () => {
+            fail("User should not be redirected to keep in")
+        }, () => {
             // Pass
         })
-        await guard(authRoute, noAuthRoute, () => {
+        await guard(mockRoutes.requiresAuth, mockRoutes.public, () => {
             fail("User logged out but not allowed to access protected route")
         })
         await flushPromises()
@@ -132,9 +149,23 @@ describe('Test router guard unauthenticated', () => {
 
     test('Allow access to unprotected route', async () => {
         const guard = routerGuard(store, () => {
+            fail("User should not be redirected to keep in")
+        }, () => {
             fail("User logged out but not allowed to access unprotected route")
         })
-        await guard(noAuthRoute, noAuthRoute, () => {
+        await guard(mockRoutes.public, mockRoutes.public, () => {
+            // Pass
+        })
+        await flushPromises()
+    })
+
+    test('Allow access to public only route', async () => {
+        const guard = routerGuard(store, () => {
+            fail("User should not be redirected to keep in")
+        }, () => {
+            fail("User logged in but not allowed to access unprotected route")
+        })
+        await guard(mockRoutes.requiresUnauth, mockRoutes.public, () => {
             // Pass
         })
         await flushPromises()

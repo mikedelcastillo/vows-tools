@@ -10,19 +10,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.routerGuard = void 0;
-const routerGuard = (store, out, vuexModule = "vows", metaKey = "requiredAuth") => {
+const routerGuard = (store, keepIn, keepOut, options = {}) => {
+    options = Object.assign({
+        vuexModule: "vows",
+        keepOutKey: "requiresAuth",
+        keepInKey: "requiresUnauth",
+    }, options);
     function guard(to, from, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (to.matched.some(record => record.meta[metaKey])) {
-                if (store.getters[`${vuexModule}/loggedIn`]) {
+            // Automatic login first
+            const loggedIn = store.getters[`${options.vuexModule}/loggedIn`];
+            const { guest_code } = store.state[options.vuexModule];
+            if (!loggedIn && guest_code) {
+                yield store.dispatch(`${options.vuexModule}/login`, guest_code);
+                return yield guard(to, from, next);
+            }
+            if (to.matched.some(record => record.meta[options.keepOutKey])) {
+                if (loggedIn) {
                     return next();
                 }
-                else if (store.state[vuexModule].guest_code) {
-                    yield store.dispatch(`${vuexModule}/login`, store.state[vuexModule].guest_code);
-                    return yield guard(to, from, next);
+                else {
+                    return yield keepOut(to, from, next);
+                }
+            }
+            else if (to.matched.some(record => record.meta[options.keepInKey])) {
+                if (loggedIn) {
+                    return yield keepIn(to, from, next);
                 }
                 else {
-                    return yield out(to, from, next);
+                    return next();
                 }
             }
             else {
