@@ -9,9 +9,9 @@
   ],
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "dev": "nodemon  --watch ./src/**/* --exec 'npm run build'",
+    "dev": "tsc --watch",
     "test": "jest",
-    "test:dev": "nodemon --exec 'npm run test'"
+    "test:dev": "jest --watch"
   },
   "repository": {
     "type": "git",
