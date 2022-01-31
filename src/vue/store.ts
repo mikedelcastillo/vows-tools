@@ -96,7 +96,7 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
             async getFaqs({commit}, faq_group_ids){
                 const { data } = await request.get("/faqs", {
                     params: {
-                        faq_group_ids,
+                        faq_group_ids: faq_group_ids instanceof Array ? faq_group_ids.join(",") : faq_group_ids,
                     },
                 })
 

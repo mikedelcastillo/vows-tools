@@ -110,7 +110,7 @@ function createVuexModule(baseURL, storageKey = "vows") {
                 return __awaiter(this, void 0, void 0, function* () {
                     const { data } = yield request.get("/faqs", {
                         params: {
-                            faq_group_ids,
+                            faq_group_ids: faq_group_ids instanceof Array ? faq_group_ids.join(",") : faq_group_ids,
                         },
                     });
                     return data;
