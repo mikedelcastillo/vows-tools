@@ -113,7 +113,7 @@ function createVuexModule(baseURL, storageKey = "vows") {
                             faq_group_ids: faq_group_ids instanceof Array ? faq_group_ids.join(",") : faq_group_ids,
                         },
                     });
-                    return data;
+                    return data.faqs;
                 });
             },
             login({ dispatch, commit }, guest_code) {

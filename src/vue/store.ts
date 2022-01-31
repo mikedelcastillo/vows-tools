@@ -100,7 +100,7 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                     },
                 })
 
-                return data
+                return data.faqs
             },
             async login({dispatch, commit}, guest_code){
                 commit('setLoading', { login: true })
