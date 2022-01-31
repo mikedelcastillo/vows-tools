@@ -49,13 +49,18 @@ describe("Test the store", () => {
         expect(data.guest.guest_code).toBe(process.env.TEST_GUEST_CODE)
     })
 
-    test('dispatch: login(TEST_GUEST_CODE', async () => {
+    test('dispatch: login(TEST_GUEST_CODE)', async () => {
         await store.dispatch('vows/login', process.env.TEST_GUEST_CODE)
         await flushPromises()
     })
 
     test('getters: loggedIn', async () => {
         expect(store.getters["vows/loggedIn"]).toBe(true)
+    })
+
+    test('dispatch: getGifts()', async () => {
+        await store.dispatch('vows/getGifts')
+        await flushPromises()
     })
 })
 

@@ -62,9 +62,13 @@ function createVuexModule(baseURL, storageKey = "vows") {
         state: {
             loading: {
                 login: false,
+                gifts: false,
             },
             guest_code: storage.get('guest_code'),
             guest: null,
+            gifts: [],
+            gift_categories: [],
+            reservations: [],
         },
         mutations: {
             setGuest(state, guest) {
@@ -77,6 +81,11 @@ function createVuexModule(baseURL, storageKey = "vows") {
             },
             setLoading(state, load) {
                 state.loading = Object.assign(state.loading, load);
+            },
+            setGifts(state, { gifts, gift_categories, reservations }) {
+                state.gifts = gifts;
+                state.gift_categories = gift_categories;
+                state.reservations = reservations;
             },
             setFaqs(state, faqs) {
                 for (let faq of faqs) {
@@ -114,6 +123,27 @@ function createVuexModule(baseURL, storageKey = "vows") {
                         },
                     });
                     return data.faqs;
+                });
+            },
+            getGifts({ state, commit }) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const update = () => __awaiter(this, void 0, void 0, function* () {
+                        const { data } = yield request.get("/gifts", {
+                            params: {
+                                guest_code: state.guest_code,
+                            },
+                        });
+                        commit('setGifts', data);
+                    });
+                    if (state.gifts.length) {
+                        commit('setLoading', { gifts: false });
+                        update();
+                    }
+                    else {
+                        commit('setLoading', { gifts: true });
+                        yield update();
+                        commit('setLoading', { gifts: false });
+                    }
                 });
             },
             login({ dispatch, commit }, guest_code) {
