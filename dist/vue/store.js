@@ -78,6 +78,17 @@ function createVuexModule(baseURL, storageKey = "vows") {
             setLoading(state, load) {
                 state.loading = Object.assign(state.loading, load);
             },
+            setFaqs(state, faqs) {
+                for (let faq of faqs) {
+                    const index = state.faqs.find(f => f.faq_id == faq.faq_id);
+                    if (index !== -1) {
+                        state.faqs[index] = Object.assign(state.faqs[index], faq);
+                    }
+                    else {
+                        state.faqs.push(faq);
+                    }
+                }
+            },
             clear(state) {
                 state.guest_code = null;
                 state.guest = null;
@@ -90,6 +101,16 @@ function createVuexModule(baseURL, storageKey = "vows") {
                     const { data } = yield request.get("/guests", {
                         params: {
                             guest_code,
+                        },
+                    });
+                    return data;
+                });
+            },
+            getFaqs({ commit }, faq_group_ids) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const { data } = yield request.get("/faqs", {
+                        params: {
+                            faq_group_ids,
                         },
                     });
                     return data;

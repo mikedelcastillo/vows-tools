@@ -167,3 +167,11 @@ describe('Test router guard unauthenticated', () => {
         await flushPromises()
     })
 })
+
+describe('Test FAQs', () => {
+    test('Get test FAQs', async () => {
+        const { faqs } = await store.dispatch('vows/getFaqs', 'test')
+        await flushPromises()
+        expect(faqs instanceof Array).toBe(true)
+    })
+})

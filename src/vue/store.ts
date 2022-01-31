@@ -67,6 +67,16 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
             setLoading(state, load){
                 state.loading = Object.assign(state.loading, load)
             },
+            setFaqs(state, faqs){
+                for(let faq of faqs){
+                    const index = state.faqs.find(f => f.faq_id == faq.faq_id)
+                    if(index !== -1){
+                        state.faqs[index] = Object.assign(state.faqs[index], faq)
+                    } else{
+                        state.faqs.push(faq)
+                    }
+                }
+            },
             clear(state){
                 state.guest_code = null
                 state.guest = null
@@ -78,6 +88,15 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                 const { data } = await request.get("/guests", {
                     params: {
                         guest_code,
+                    },
+                })
+
+                return data
+            },
+            async getFaqs({commit}, faq_group_ids){
+                const { data } = await request.get("/faqs", {
+                    params: {
+                        faq_group_ids,
                     },
                 })
 
