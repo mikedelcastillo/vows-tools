@@ -34,16 +34,18 @@ export declare function createVuexModule(baseURL: string, storageKey?: string): 
             state: any;
             commit: any;
         }, force?: boolean): Promise<void>;
-        reserveGift({ state, dispatch }: {
+        reserveGift({ state, dispatch, commit }: {
             state: any;
             dispatch: any;
+            commit: any;
         }, { gift_id, quantity }: {
             gift_id: any;
             quantity: any;
         }): Promise<void>;
-        unreserveGift({ state, dispatch }: {
+        unreserveGift({ state, dispatch, commit }: {
             state: any;
             dispatch: any;
+            commit: any;
         }, { gift_id, quantity }: {
             gift_id: any;
             quantity: any;

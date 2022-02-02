@@ -129,14 +129,16 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                     commit('setLoading', { gifts: false })
                 }
             },
-            async reserveGift({state, dispatch}, {gift_id, quantity}){
+            async reserveGift({state, dispatch, commit}, {gift_id, quantity}){
+                commit('setLoading', { gifts: true })
                 const { data } = await request.post("/gifts/reserve", {
                     guest_code: state.guest_code,
                     gift_id, quantity,
                 })
                 await dispatch('getGifts', true)
             },
-            async unreserveGift({state, dispatch}, {gift_id, quantity}){
+            async unreserveGift({state, dispatch, commit}, {gift_id, quantity}){
+                commit('setLoading', { gifts: true })
                 const { data } = await request.post("/gifts/unreserve", {
                     guest_code: state.guest_code,
                     gift_id, quantity,

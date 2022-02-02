@@ -145,8 +145,9 @@ function createVuexModule(baseURL, storageKey = "vows") {
                     }
                 });
             },
-            reserveGift({ state, dispatch }, { gift_id, quantity }) {
+            reserveGift({ state, dispatch, commit }, { gift_id, quantity }) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    commit('setLoading', { gifts: true });
                     const { data } = yield request.post("/gifts/reserve", {
                         guest_code: state.guest_code,
                         gift_id, quantity,
@@ -154,8 +155,9 @@ function createVuexModule(baseURL, storageKey = "vows") {
                     yield dispatch('getGifts', true);
                 });
             },
-            unreserveGift({ state, dispatch }, { gift_id, quantity }) {
+            unreserveGift({ state, dispatch, commit }, { gift_id, quantity }) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    commit('setLoading', { gifts: true });
                     const { data } = yield request.post("/gifts/unreserve", {
                         guest_code: state.guest_code,
                         gift_id, quantity,
