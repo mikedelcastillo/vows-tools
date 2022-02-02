@@ -1,9 +1,7 @@
 require('dotenv').config()
 
 const requiredVars = [
-    "API_TOKEN",
     "API_URL",
-    "TEST_GUEST_CODE",
 ]
 
 describe("Test the testing environment", () => {

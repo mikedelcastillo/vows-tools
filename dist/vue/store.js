@@ -125,7 +125,7 @@ function createVuexModule(baseURL, storageKey = "vows") {
                     return data.faqs;
                 });
             },
-            getGifts({ state, commit }) {
+            getGifts({ state, commit }, force = false) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const update = () => __awaiter(this, void 0, void 0, function* () {
                         const { data } = yield request.get("/gifts", {
@@ -135,15 +135,32 @@ function createVuexModule(baseURL, storageKey = "vows") {
                         });
                         commit('setGifts', data);
                     });
-                    if (state.gifts.length) {
-                        commit('setLoading', { gifts: false });
-                        update();
-                    }
-                    else {
+                    if (force || state.gifts.length == 0) {
                         commit('setLoading', { gifts: true });
                         yield update();
                         commit('setLoading', { gifts: false });
                     }
+                    else {
+                        commit('setLoading', { gifts: false });
+                    }
+                });
+            },
+            reserveGift({ state, dispatch }, { gift_id, quantity }) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const { data } = yield request.post("/gifts/reserve", {
+                        guest_code: state.guest_code,
+                        gift_id, quantity,
+                    });
+                    yield dispatch('getGifts', true);
+                });
+            },
+            unreserveGift({ state, dispatch }, { gift_id, quantity }) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const { data } = yield request.post("/gifts/unreserve", {
+                        guest_code: state.guest_code,
+                        gift_id, quantity,
+                    });
+                    yield dispatch('getGifts', true);
                 });
             },
             login({ dispatch, commit }, guest_code) {

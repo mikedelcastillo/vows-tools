@@ -112,7 +112,7 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
 
                 return data.faqs
             },
-            async getGifts({state, commit}){
+            async getGifts({state, commit}, force = false){
                 const update = async () => {
                     const { data } = await request.get("/gifts", {
                         params: {
@@ -121,14 +121,27 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                     })
                     commit('setGifts', data)
                 }
-                if(state.gifts.length){
-                    commit('setLoading', { gifts: false })
-                    update()
-                } else{
+                if(force || state.gifts.length == 0){
                     commit('setLoading', { gifts: true })
                     await update()
                     commit('setLoading', { gifts: false })
+                } else{
+                    commit('setLoading', { gifts: false })
                 }
+            },
+            async reserveGift({state, dispatch}, {gift_id, quantity}){
+                const { data } = await request.post("/gifts/reserve", {
+                    guest_code: state.guest_code,
+                    gift_id, quantity,
+                })
+                await dispatch('getGifts', true)
+            },
+            async unreserveGift({state, dispatch}, {gift_id, quantity}){
+                const { data } = await request.post("/gifts/unreserve", {
+                    guest_code: state.guest_code,
+                    gift_id, quantity,
+                })
+                await dispatch('getGifts', true)
             },
             async login({dispatch, commit}, guest_code){
                 commit('setLoading', { login: true })

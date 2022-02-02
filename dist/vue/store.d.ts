@@ -33,6 +33,20 @@ export declare function createVuexModule(baseURL: string, storageKey?: string): 
         getGifts({ state, commit }: {
             state: any;
             commit: any;
+        }, force?: boolean): Promise<void>;
+        reserveGift({ state, dispatch }: {
+            state: any;
+            dispatch: any;
+        }, { gift_id, quantity }: {
+            gift_id: any;
+            quantity: any;
+        }): Promise<void>;
+        unreserveGift({ state, dispatch }: {
+            state: any;
+            dispatch: any;
+        }, { gift_id, quantity }: {
+            gift_id: any;
+            quantity: any;
         }): Promise<void>;
         login({ dispatch, commit }: {
             dispatch: any;

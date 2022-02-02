@@ -8,6 +8,7 @@ const { createVuexModule } = require('../dist/index')
 const { createVueRouterGuard } = require('../dist/index')
 
 let store = null
+const TEST_KEY = "TEST"
 
 const mockRoute = meta => ({
     matched: [ {meta}, {meta}, {meta} ],
@@ -20,6 +21,7 @@ const mockRoutes = {
 
 describe("Test the store", () => {
     test('Setup store with vows module', () => {
+        
         store = createStore({
             modules: {
                 vows: createVuexModule(process.env.API_URL),
@@ -28,12 +30,14 @@ describe("Test the store", () => {
     })
 
     test('Test API connection', async () => {
+        
         const { data } = await axios.get(process.env.API_URL)
         await flushPromises()
-        expect(data.ok).toBe(true)
+        await expect(data.ok).toBe(true)
     })
 
     test('dispatch: getGuest(WRONG_GUEST_CODE)', async () => {
+        
         try{
             await store.dispatch("vows/getGuest", Math.random())
             fail('Guest should return a 404')
@@ -44,21 +48,25 @@ describe("Test the store", () => {
     })
 
     test('dispatch: getGuest(TEST_GUEST_CODE)', async () => {
-        const data = await store.dispatch("vows/getGuest", process.env.TEST_GUEST_CODE)
+        
+        const data = await store.dispatch("vows/getGuest", TEST_KEY)
         await flushPromises()
-        expect(data.guest.guest_code).toBe(process.env.TEST_GUEST_CODE)
+        await expect(data.guest.guest_code).toBe(TEST_KEY)
     })
 
     test('dispatch: login(TEST_GUEST_CODE)', async () => {
-        await store.dispatch('vows/login', process.env.TEST_GUEST_CODE)
+        
+        await store.dispatch('vows/login', TEST_KEY)
         await flushPromises()
     })
 
     test('getters: loggedIn', async () => {
-        expect(store.getters["vows/loggedIn"]).toBe(true)
+        
+        await expect(store.getters["vows/loggedIn"]).toBe(true)
     })
 
     test('dispatch: getGifts()', async () => {
+        
         await store.dispatch('vows/getGifts')
         await flushPromises()
     })
@@ -66,10 +74,12 @@ describe("Test the store", () => {
 
 describe('Test router guard authenticated', () => {
     test('Create route guard', async () => {
+        
         const guard = createVueRouterGuard(store)
     })
     
     test('Allow access to protected route', async () => {
+        
         const guard = createVueRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
@@ -82,6 +92,7 @@ describe('Test router guard authenticated', () => {
     })
 
     test('Allow access to unprotected route', async () => {
+        
         const guard = createVueRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
@@ -94,6 +105,7 @@ describe('Test router guard authenticated', () => {
     })
 
     test('Block access to public only route', async () => {
+        
         const guard = createVueRouterGuard(store, () => {
             // Pass
         }, () => {
@@ -106,10 +118,11 @@ describe('Test router guard authenticated', () => {
     })
 
     test('Simulate auto re-login', async () => {
+        
         store.commit('vows/setGuest', null)
-        expect(store.state.vows.guest).toBeNull()
-        expect(store.state.vows.guest_code).not.toBeNull()
-        expect(store.getters['vows/loggedIn']).toBe(false)
+        await expect(store.state.vows.guest).toBeNull()
+        await expect(store.state.vows.guest_code).not.toBeNull()
+        await expect(store.getters['vows/loggedIn']).toBe(false)
         
         const guard = createVueRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
@@ -120,16 +133,96 @@ describe('Test router guard authenticated', () => {
             // Pass
         })
         await flushPromises()
-        expect(store.state.vows.guest).not.toBeNull()
+        await expect(store.state.vows.guest).not.toBeNull()
     })
+
+    test('Cannot reserve more than available quantity', async () => {
+        
+        try{
+            await store.dispatch('vows/reserveGift', {
+                quantity: 5,
+                gift_id: TEST_KEY,
+            })
+            await flushPromises()
+            fail("Should not be able to reserve more than available")
+        } catch(e){
+
+        }
+    })
+
+    test('Reserve the test gift', async () => {
+        
+        await store.dispatch('vows/reserveGift', {
+            quantity: 2,
+            gift_id: TEST_KEY,
+        })
+        await flushPromises()
+    })
+
+    test('Cannot reserve more than available quantity', async () => {
+        
+        try{
+            await store.dispatch('vows/reserveGift', {
+                quantity: 2,
+                gift_id: TEST_KEY,
+            })
+            await flushPromises()
+            fail("Should not be able to reserve more than available")
+        } catch(e){
+
+        }
+    })
+
+    test('Reserve the test gift', async () => {
+        
+        await store.dispatch('vows/reserveGift', {
+            quantity: 1,
+            gift_id: TEST_KEY,
+        })
+        await flushPromises()
+    })
+
+    test('Cannot reserve more than available quantity', async () => {
+        
+        try{
+            await store.dispatch('vows/reserveGift', {
+                quantity: 2,
+                gift_id: TEST_KEY,
+            })
+            await flushPromises()
+            fail("Should not be able to reserve more than available")
+        } catch(e){
+
+        }
+    })
+
+    test('Should have only 3 reserved', async () => {
+        
+        await store.dispatch('vows/getGifts')
+        await flushPromises()
+        const quantity = store.state.vows.reservations.map(a=>a.quantity).reduce((a,b)=>a+b,0)
+        await expect(quantity).toBe(3)
+    })
+
+    test('Can unreserve gift', async () => {
+        
+        await store.dispatch('vows/unreserveGift', {
+            gift_id: TEST_KEY,
+        })
+        await flushPromises()
+        const quantity = store.state.vows.reservations.map(a=>a.quantity).reduce((a,b)=>a+b,0)
+        await expect(quantity).toBe(0)
+    })
+
 })
 
 describe('Clear the store', () => {
     test('commit: clear', async () => {
+        
         store.commit('vows/clear')
-        expect(store.state.vows.guest_code).toBeNull()
-        expect(store.state.vows.guest).toBeNull()
-        expect(store.getters["vows/loggedIn"]).toBe(false)
+        await expect(store.state.vows.guest_code).toBeNull()
+        await expect(store.state.vows.guest).toBeNull()
+        await expect(store.getters["vows/loggedIn"]).toBe(false)
     })
 
     // Should not be able to do guest things
@@ -137,6 +230,7 @@ describe('Clear the store', () => {
 
 describe('Test router guard unauthenticated', () => {
     test('Block access to protected route', async () => {
+        
         const guard = createVueRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
@@ -149,6 +243,7 @@ describe('Test router guard unauthenticated', () => {
     })
 
     test('Allow access to unprotected route', async () => {
+        
         const guard = createVueRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
@@ -161,6 +256,7 @@ describe('Test router guard unauthenticated', () => {
     })
 
     test('Allow access to public only route', async () => {
+        
         const guard = createVueRouterGuard(store, () => {
             fail("User should not be redirected to keep in")
         }, () => {
@@ -175,8 +271,10 @@ describe('Test router guard unauthenticated', () => {
 
 describe('Test FAQs', () => {
     test('Get test FAQs', async () => {
+        
         const faqs = await store.dispatch('vows/getFaqs', 'test')
+        
         await flushPromises()
-        expect(faqs instanceof Array).toBe(true)
+        await expect(faqs instanceof Array).toBe(true)
     })
 })
