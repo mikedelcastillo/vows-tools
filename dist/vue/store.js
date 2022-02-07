@@ -69,6 +69,7 @@ function createVuexModule(baseURL, storageKey = "vows") {
             gifts: [],
             gift_categories: [],
             reservations: [],
+            config: {},
         },
         mutations: {
             setGuest(state, guest) {
@@ -86,6 +87,9 @@ function createVuexModule(baseURL, storageKey = "vows") {
                 state.gifts = gifts;
                 state.gift_categories = gift_categories;
                 state.reservations = reservations;
+            },
+            setConfig(state, config = {}) {
+                state.config = Object.assign({}, state.config, config);
             },
             setFaqs(state, faqs) {
                 for (let faq of faqs) {
@@ -184,7 +188,21 @@ function createVuexModule(baseURL, storageKey = "vows") {
                         throw e;
                     }
                 });
-            }
+            },
+            getConfig({ state, dispatch, commit }, config_id) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (config_id in state.config)
+                        return state.config[config_id];
+                    commit('setLoading', { config: true });
+                    const { data } = yield request.post("/config", {
+                        guest_code: state.guest_code,
+                        config_id,
+                    });
+                    commit('setConfig', data);
+                    commit('setLoading', { config: true });
+                    return state.config[config_id];
+                });
+            },
         },
         getters: {
             loggedIn(state) {
