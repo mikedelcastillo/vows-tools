@@ -177,7 +177,7 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                     },
                 })
                 commit('setConfig', data)
-                commit('setLoading', { config: true })
+                commit('setLoading', { config: false })
                 return state.config[config_id]
             },
         },
