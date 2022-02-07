@@ -170,9 +170,11 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                 if(config_id in state.config) return state.config[config_id]
 
                 commit('setLoading', { config: true })
-                const { data } = await request.post("/config", {
+                const { data } = await request.get("/config", {
+                    params: {
                     guest_code: state.guest_code,
                     config_id,
+                    },
                 })
                 commit('setConfig', data)
                 commit('setLoading', { config: true })

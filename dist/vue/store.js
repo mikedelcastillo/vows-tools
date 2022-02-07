@@ -194,9 +194,11 @@ function createVuexModule(baseURL, storageKey = "vows") {
                     if (config_id in state.config)
                         return state.config[config_id];
                     commit('setLoading', { config: true });
-                    const { data } = yield request.post("/config", {
-                        guest_code: state.guest_code,
-                        config_id,
+                    const { data } = yield request.get("/config", {
+                        params: {
+                            guest_code: state.guest_code,
+                            config_id,
+                        },
                     });
                     commit('setConfig', data);
                     commit('setLoading', { config: true });
