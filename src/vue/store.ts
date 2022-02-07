@@ -59,6 +59,8 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
             gifts: [],
             gift_categories: [],
             reservations: [],
+
+            config: {},
         },
         mutations: {
             setGuest(state, guest){
@@ -76,6 +78,9 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                 state.gifts = gifts
                 state.gift_categories = gift_categories
                 state.reservations = reservations
+            },
+            setConfig(state, config = {}){
+                state.config = Object.assign({}, state.config, config)
             },
             setFaqs(state, faqs){
                 for(let faq of faqs){
@@ -160,7 +165,19 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                     commit('setLoading', { login: false })
                     throw e
                 }
-            }
+            },
+            async getConfig({state, dispatch, commit}, config_id){
+                if(config_id in state.config) return state.config[config_id]
+
+                commit('setLoading', { config: true })
+                const { data } = await request.post("/config", {
+                    guest_code: state.guest_code,
+                    config_id,
+                })
+                commit('setConfig', data)
+                commit('setLoading', { config: true })
+                return state.config[config_id]
+            },
         },
         getters: {
             loggedIn(state){
