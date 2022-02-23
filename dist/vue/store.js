@@ -69,6 +69,7 @@ function createVuexModule(baseURL, storageKey = "vows") {
             gifts: [],
             gift_categories: [],
             reservations: [],
+            stories: {},
             config: {},
         },
         mutations: {
@@ -90,6 +91,9 @@ function createVuexModule(baseURL, storageKey = "vows") {
             },
             setConfig(state, config = {}) {
                 state.config = Object.assign({}, state.config, config);
+            },
+            setStories(state, stories) {
+                state.stories = Object.assign({}, stories);
             },
             setFaqs(state, faqs) {
                 for (let faq of faqs) {
@@ -203,6 +207,12 @@ function createVuexModule(baseURL, storageKey = "vows") {
                     commit('setConfig', data);
                     commit('setLoading', { config: false });
                     return state.config[config_id];
+                });
+            },
+            getStories({ commit }) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const { data } = yield request.get("/stories");
+                    commit('setStories', data.stories);
                 });
             },
         },

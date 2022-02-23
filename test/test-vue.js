@@ -230,10 +230,13 @@ module.exports = async () => {
         })
     })
 
-    await describe('Test FAQs', async ({test}) => {
+    await describe('Test API', async ({test}) => {
         await test('Get test FAQs', async () => {
             const faqs = await store.dispatch('vows/getFaqs', 'test')
             await assert.instanceOf(faqs, Array)
+        })
+        await test('Get stories', async () => {
+            await store.dispatch('vows/getStories')
         })
     })
 }

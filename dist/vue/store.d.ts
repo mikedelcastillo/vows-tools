@@ -10,6 +10,7 @@ export declare function createVuexModule(baseURL: string, storageKey?: string): 
         gifts: any[];
         gift_categories: any[];
         reservations: any[];
+        stories: {};
         config: {};
     };
     mutations: {
@@ -22,6 +23,7 @@ export declare function createVuexModule(baseURL: string, storageKey?: string): 
             reservations: any;
         }): void;
         setConfig(state: any, config?: {}): void;
+        setStories(state: any, stories: any): void;
         setFaqs(state: any, faqs: any): void;
         clear(state: any): void;
     };
@@ -61,6 +63,9 @@ export declare function createVuexModule(baseURL: string, storageKey?: string): 
             dispatch: any;
             commit: any;
         }, config_id: any): Promise<any>;
+        getStories({ commit }: {
+            commit: any;
+        }): Promise<void>;
     };
     getters: {
         loggedIn(state: any): boolean;
