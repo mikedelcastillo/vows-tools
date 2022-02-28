@@ -167,6 +167,7 @@ export function createVuexModule(baseURL: string, storageKey: string = "vows"){
                         throw new Error('Data recieved is invalid')
                     }
                 } catch(e){
+                    commit('clear')
                     commit('setLoading', { login: false })
                     throw e
                 }

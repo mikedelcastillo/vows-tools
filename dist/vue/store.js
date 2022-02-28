@@ -188,6 +188,7 @@ function createVuexModule(baseURL, storageKey = "vows") {
                         }
                     }
                     catch (e) {
+                        commit('clear');
                         commit('setLoading', { login: false });
                         throw e;
                     }
